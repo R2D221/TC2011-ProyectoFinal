@@ -12,12 +12,45 @@ package tc2011.proyectofinal;
 public class TC2011ProyectoFinal
 {
 
-	/**
-	 * @param args the command line arguments
-	 */
-	public static void main(String[] args)
+	public static void main(String[] args) throws IOException 
 	{
-		// TODO code application logic here
+          
+        leerArchivoEjemplos();
+        x = ListToArray(lectura_ejemplos);    		
 	}
+        
+        public static void leerArchivoEjemplos() throws FileNotFoundException, IOException{
+             try {
+                FileInputStream fstream = new FileInputStream("X.txt");
+                
+                DataInputStream entrada = new DataInputStream(fstream);
+                
+                BufferedReader buffer = new BufferedReader(new InputStreamReader(entrada));
+                String strLinea;
+                while ((strLinea = buffer.readLine()) != null && !(strLinea.equals(""))) {
+                    ejemplo = strLinea.substring(1,strLinea.length()).split(" ");                                  
+                    double[] copia_ejemplo = new double[ejemplo.length];                  
+                     for(int i=0; i< ejemplo.length;i++){
+                         double a = Double.parseDouble(ejemplo[i]);                                               
+                         copia_ejemplo[i] = Double.parseDouble(ejemplo[i]);                    
+                     }
+                     System.out.println("Con " + copia_ejemplo.length + " valores");
+                     lectura_ejemplos.add(copia_ejemplo); 
+                }                
+                entrada.close();
+            } catch (Exception e) { 
+                System.err.println("Ocurrio un error: " + e.getMessage());
+            }
+        }
+
+    public static double[][] ListToArray(List<double[]> lectura_ejemplos) {
+        double[][] x = new double[lectura_ejemplos.size()][lectura_ejemplos.get(0).length];
+        for(int i = 0; i< lectura_ejemplos.size(); i++){
+            for(double[] a : lectura_ejemplos){
+                x[i] = a;
+            }
+        }        
+        return x;
+    }
 	
 }
