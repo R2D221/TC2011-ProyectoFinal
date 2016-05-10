@@ -16,6 +16,8 @@ public class NeuralNetwork
 	private final double[] a1;
 	private final double[] a2;
 	private final double[] a3;
+	private double[] z2;
+	private double[] z3;
 	private final double[][] Theta1;
     private final double[][] Theta2;
 	
@@ -24,6 +26,8 @@ public class NeuralNetwork
 		a1 = new double[input_size + 1];
 		a2 = new double[hidden_size + 1];
 		a3 = new double[output_size];
+		z2 = new double[hidden_size + 1];
+		z3 = new double[output_size];
 		Theta1 = new double[hidden_size][input_size + 1];
 		for (int i = 0; i < hidden_size; i++)
 		{
@@ -97,18 +101,32 @@ public class NeuralNetwork
 			{
 				δ3[k] = (a3[k] - y[i][k]);
 			}
+			
+			double[] δ2 = Helpers.pointMult(Helpers.multMatrix(Helpers.transposeMatrix(Theta2), δ3), sigmoidGradient(z2));
+			
+			// INCOMPLETE
 		}
 		
 		return 0;
 	}
 
 	public static double g(double z){
-            return (1 / (1 + Math.exp(-z)));
+        return (1 / (1 + Math.exp(-z)));
     }
 
 	public static double sigmoidGradient(double z){
         return g(z) * (1 - g(z));
     }
+	
+	public static double[] sigmoidGradient(double[] z)
+	{
+		double[] result = new double[z.length];
+		for (int i = 0; i < z.length; i++)
+		{
+			result[i] = sigmoidGradient(z[i]);
+		}
+		return result;
+	}
     
     public static void randInitializeWeights(int input_size, double[] L_int, int output_size, double[] L_out){       
  

@@ -67,7 +67,7 @@ public class Helpers
 		}
 		if (a[0].length != b.length)
 		{
-			throw new RuntimeException();
+			throw new RuntimeException("Matrix size mismatch");
 		}
 		int n = a[0].length;
 		int m = a.length;
@@ -87,5 +87,22 @@ public class Helpers
 			}
 		}
 		return ans;
+	}
+	
+	public static double[] pointMult(double[] a, double[] b)
+	{
+		if (a.length != b.length)
+		{
+			throw new RuntimeException("Matrix size mismatch");
+		}
+		
+		double[] result = new double[a.length];
+		
+		for (int i = 0; i < a.length; i++)
+		{
+			result[i] = a[i] * b[i];
+		}
+		
+		return result;
 	}
 }
