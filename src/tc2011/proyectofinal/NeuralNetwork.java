@@ -67,12 +67,13 @@ public class NeuralNetwork
         double parametro_e = 0.12;
  
         for(int i = 0; i < input_size; i++){
-            L_int[i] = ((-1 * parametro_e) * Math.random()) + (parametro_e * Math.random());
+            L_int[i] = (Math.random() * 2 * parametro_e) - parametro_e;
         }
         
         for(int j = 0; j < output_size; j++){
-            L_out[j] = ((-1 * parametro_e) * Math.random()) + (parametro_e * Math.random());
+            L_int[j] = (Math.random() * 2 * parametro_e)- parametro_e;
         }
+ 
     } 
 	
 }
