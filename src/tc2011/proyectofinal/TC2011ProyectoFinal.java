@@ -65,7 +65,7 @@ public class TC2011ProyectoFinal
                 while ((strLinea = buffer.readLine()) != null && !(strLinea.equals(""))) {
                                                         
                     int ejemplo = Integer.parseInt(strLinea.substring(1,strLinea.length()));
-                    double[] digito = new double[11]; 
+                    double[] digito = new double[10]; 
                     
                     if(ejemplo != 0){
                        digito[ejemplo-1] = 1;
