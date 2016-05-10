@@ -42,5 +42,23 @@ public class NeuralNetwork
 			)
 		;
 	}
+
+
+	public static double sigmoidGradient(double z){
+        return (1/ (1+ Math.exp(-z))) * (1 - ((1/ (1+ Math.exp(-z)))) );
+    }
+    
+    public static void randInitializeWeights(int input_size, double[] L_int, int output_size, double[] L_out){       
+ 
+        double parametro_e = 0.12;
+ 
+        for(int i = 0; i < input_size; i++){
+            L_int[i] = ((-1 * parametro_e) * Math.random()) + (parametro_e * Math.random());
+        }
+        
+        for(int j = 0; j < output_size; j++){
+            L_out[j] = ((-1 * parametro_e) * Math.random()) + (parametro_e * Math.random());
+        }
+    } 
 	
 }
