@@ -5,6 +5,7 @@
  */
 package tc2011.proyectofinal;
 
+import java.util.*;
 import java.util.function.*;
 import java.util.stream.*;
 
@@ -145,7 +146,7 @@ public class Helpers
 	{
 		if (a.length != b.length)
 		{
-			throw new RuntimeException("Matrix size mismatch");
+			throw new RuntimeException("Matrix size mismatch: a["+a.length+"], b["+b.length+"]");
 		}
 		
 		double[] result = new double[a.length];
@@ -156,5 +157,10 @@ public class Helpers
 		}
 		
 		return result;
+	}
+	
+	public static double[] removeFirst(double[] a)
+	{
+		return Arrays.copyOfRange(a, 1, a.length);
 	}
 }

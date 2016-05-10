@@ -19,8 +19,8 @@ public class NeuralNetwork
 	private final double[] a3;
 	private double[] z2;
 	private double[] z3;
-	private final double[][] Theta1;
-	private final double[][] Theta2;
+	public final double[][] Theta1;
+	public final double[][] Theta2;
 
 	public NeuralNetwork(int input_size, int hidden_size, int output_size)
 	{
@@ -50,17 +50,17 @@ public class NeuralNetwork
 	{
 		//Primera capa
 		a1[0] = 1; // bias
-		for (int i = 1; i < a1.length; i++)
+		for (int i = 0; i < x.length; i++)
 		{
-			a1[i] = x[i];
+			a1[i + 1] = x[i];
 		}
 
 		//Capa Intermedia
 		z2 = multMatrix(Theta1, a1);
 		a2[0] = 1; // bias
-		for (int i = 1; i < z2.length; i++)
+		for (int i = 0; i < z2.length; i++)
 		{
-			a2[i] = g(z2[i]);
+			a2[i + 1] = g(z2[i]);
 		}
 
 		//Capa de salida
@@ -73,32 +73,16 @@ public class NeuralNetwork
 		return Arrays.copyOf(a3, a3.length);
 	}
 
-	public double rnFuncionCosto(double[][] Theta1, double[][] Theta2, int input_layer_size, int hidden_layer_size, int num_labels, double[][] x, double[][] y, double lambda)
+	public double rnFuncionCosto(/*double[][] Theta1, double[][] Theta2, */int input_layer_size, int hidden_layer_size, int num_labels, double[][] x, double[][] y, double lambda)
 	{
 		int m = x.length;
 		int K = num_labels;
 
-		double J_Θ
-			= (1.0 / m)
-			* sum(0, m, i
-				-> sum(0, K, k
-					-> -y[i][k] * Math.log(a3[k]) - (1 - y[i][k]) * Math.log(1 - a3[k]) // h_theta(x[i])[k] = a3[k]
-				)
-			)
-			+ (lambda / (2 * m))
-			* (sum(0, hidden_layer_size, j
-				-> sum(0, input_layer_size, k
-					-> Math.pow(Theta1[j][k + 1], 2)
-				)
-			)
-			+ sum(0, num_labels, j
-				-> sum(0, hidden_layer_size, k
-					-> Math.pow(Theta2[j][k + 1], 2)
-				)
-			));
-
 		double[][] Δ1 = null;
 		double[][] Δ2 = null;
+		
+		double J_Θ = 0;
+		
 		for (int i = 0; i < x.length; i++)
 		{
 			feedForward(x[i]);
@@ -107,9 +91,10 @@ public class NeuralNetwork
 			for (int k = 0; k < a3.length; k++)
 			{
 				δ3[k] = (a3[k] - y[i][k]);
+				J_Θ += -y[i][k] * Math.log(a3[k]) - (1 - y[i][k]) * Math.log(1 - a3[k]);
 			}
 
-			double[] δ2 = pointMult(multMatrix(transposeMatrix(Theta2), δ3), sigmoidGradient(z2));
+			double[] δ2 = pointMult(removeFirst(multMatrix(transposeMatrix(Theta2), δ3)), sigmoidGradient(z2));
 			if (Δ2 == null)
 			{
 				Δ2 = multMatrix(δ3, transposeMatrix(a2));
@@ -120,13 +105,38 @@ public class NeuralNetwork
 			}
 			if (Δ1 == null)
 			{
-				Δ1 = multMatrix(Arrays.copyOfRange(δ2, 1, δ2.length), transposeMatrix(a1));
+				Δ1 = multMatrix(δ2, transposeMatrix(a1));
 			}
 			else
 			{
-				Δ1 = addMatrix(Δ1, multMatrix(Arrays.copyOfRange(δ2, 1, δ2.length), transposeMatrix(a1)));
+				Δ1 = addMatrix(Δ1, multMatrix(δ2, transposeMatrix(a1)));
 			}
 		}
+
+		J_Θ = (J_Θ / m)
+//			(1.0 / m)
+//			*
+//			sum(0, m, i ->
+//				sum(0, K, k ->
+//					-y[i][k] * Math.log(a3[k]) - (1 - y[i][k]) * Math.log(1 - a3[k]) // h_theta(x[i])[k] = a3[k]
+//				)
+//			)
+			+
+			(lambda / (2 * m))
+			*
+			(
+				sum(0, Theta1.length, j ->
+					sum(0, Theta1[0].length, k ->
+						Math.pow(Theta1[j][k], 2)
+					)
+				)
+				+
+				sum(0, Theta2.length, j ->
+					sum(0, Theta2[0].length, k ->
+						Math.pow(Theta2[j][k], 2)
+					)
+				)
+			);
 		
 		double[][] D1 = new double[Δ1.length][Δ1[0].length];
 		for (int i = 0; i < D1.length; i++)
@@ -138,7 +148,7 @@ public class NeuralNetwork
 				D1[i][j] = (1.0 / m) * Δ1[i][j] + (lambda / m) * Theta1[i][j];
 			}
 		}
-		
+
 		double[][] D2 = new double[Δ2.length][Δ2[0].length];
 		for (int i = 0; i < D2.length; i++)
 		{
@@ -150,22 +160,19 @@ public class NeuralNetwork
 			}
 		}
 		
-		
-		double learningRate = 0.7;
-		
 		for (int i = 0; i < Theta1.length; i++)
 		{
 			for (int j = 0; j < Theta1[0].length; j++)
 			{
-				Theta1[i][j] = Theta1[i][j] - (D1[i][j] * learningRate);
+				Theta1[i][j] = Theta1[i][j] - (D1[i][j]);
 			}
 		}
 		
 		for (int i = 0; i < Theta2.length; i++)
 		{
-			for (int j = 0; j < Theta1[0].length; j++)
+			for (int j = 0; j < Theta2[0].length; j++)
 			{
-				Theta2[i][j] = Theta2[i][j] - (D2[i][j] * learningRate);
+				Theta2[i][j] = Theta2[i][j] - (D2[i][j]);
 			}
 		}
 
@@ -206,7 +213,7 @@ public class NeuralNetwork
 		
 		for (int i = 0; i < Theta2.length; i++)
 		{
-			for (int j = 0; j < Theta1[0].length; j++)
+			for (int j = 0; j < Theta2[0].length; j++)
 			{
 				Theta2[i][j] = (Math.random() * 2 * parametro_e) - parametro_e;
 			}
