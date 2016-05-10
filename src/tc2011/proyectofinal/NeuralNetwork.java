@@ -13,16 +13,29 @@ import static tc2011.proyectofinal.Helpers.sum;
  */
 public class NeuralNetwork
 {
-	public static double rnFuncionCosto(double[][] Theta1, double[][] Theta2, int input_layer_size, int hidden_layer_size, int num_labels, double[][] x, double[][] y, double lambda)
+	private final double[] a1;
+	private final double[] a2;
+	private final double[] a3;
+	
+	public NeuralNetwork(int input_size, int hidden_size, int output_size)
 	{
-		int m = input_layer_size;
+		a1 = new double[input_size];
+		a2 = new double[hidden_size];
+		a3 = new double[output_size];
+	}
+	
+	//public static 
+	
+	public double rnFuncionCosto(double[][] Theta1, double[][] Theta2, int input_layer_size, int hidden_layer_size, int num_labels, double[][] x, double[][] y, double lambda)
+	{
+		int m = x.length;//input_layer_size;
 		int K = num_labels;
 		
-		return
+		double J_Θ =
 			(1.0 / m) *
 			sum(0, m, i ->
 				sum(0, K, k ->
-					-y[i][k] * Math.log(h_theta(x[i])[k]) - (1 - y[i][k]) * Math.log(1 - h_theta(x[i])[k])
+					-y[i][k] * Math.log(a3[k]) - (1 - y[i][k]) * Math.log(1 - a3[k]) // h_theta(x[i])[k] = a3[k]
 				)
 			)
 			+
@@ -39,8 +52,9 @@ public class NeuralNetwork
 						Math.pow(Theta2[j][k], 2)
 					)
 				)
-			)
-		;
+			);
+		
+		return 0;
 	}
 
 
