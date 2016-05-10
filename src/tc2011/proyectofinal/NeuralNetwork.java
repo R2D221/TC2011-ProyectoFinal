@@ -16,12 +16,16 @@ public class NeuralNetwork
 	private final double[] a1;
 	private final double[] a2;
 	private final double[] a3;
+	private final double[][] Theta1;
+    private final double[][] Theta2;
 	
 	public NeuralNetwork(int input_size, int hidden_size, int output_size)
 	{
 		a1 = new double[input_size];
 		a2 = new double[hidden_size];
 		a3 = new double[output_size];
+		Theta1 = new double[hidden_size][input_size];
+        Theta2 = new double[output_size][hidden_size];
 	}
 	
 	//public static 
