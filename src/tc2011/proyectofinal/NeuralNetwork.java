@@ -66,7 +66,28 @@ public class NeuralNetwork
 				)
 			);
 		
-		// [insert feedforward here]
+		public void feedForward(double[] a1,double[] a2, double[] a3, double[][] x){
+
+        	//Primera capa
+        	for(int i =0; i < x.length; i++){
+            	for(int j =0; j < a1.length; j++){
+                	a1[j] = x[i][j];
+            	}
+        	}
+        
+        	//Capa Intermedia
+        	double z2[] = multMatrix(Theta1,a1);
+        	for(int j=0; j < z2.length; j++){
+                a2[j] = g(z2[j]);
+        	}
+        
+        	//Capa de salida
+        	double z3[] = multMatrix(Theta2,a2);
+        	for(int j=0; j < z3.length; j++){
+            	a3[j] = g(z3[j]);
+        	}
+        
+    	}
 		
 		for (int i = 0; i < x.length; i++)
 		{
