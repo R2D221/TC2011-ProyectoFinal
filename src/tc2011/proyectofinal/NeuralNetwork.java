@@ -31,9 +31,22 @@ public class NeuralNetwork
 		z3 = new double[output_size];
 		Theta1 = new double[hidden_size][input_size + 1];
 		Theta2 = new double[output_size][hidden_size + 1];
+		randInitializeWeights();
+	}
+	
+	private NeuralNetwork(double[][] Theta1, double[][] Theta2)
+	{
+		this.Theta1 = Theta1;
+		this.Theta2 = Theta2;
+		
+		a1 = new double[Theta1[0].length];
+		a2 = new double[Theta2[0].length];
+		a3 = new double[Theta2.length];
+		z2 = new double[Theta2[0].length];
+		z3 = new double[Theta2.length];
 	}
 
-	public void feedForward(double[] x)
+	public double[] feedForward(double[] x)
 	{
 		//Primera capa
 		a1[0] = 1; // bias
@@ -56,6 +69,8 @@ public class NeuralNetwork
 		{
 			a3[i] = g(z3[i]);
 		}
+		
+		return Arrays.copyOf(a3, a3.length);
 	}
 
 	public double rnFuncionCosto(double[][] Theta1, double[][] Theta2, int input_layer_size, int hidden_layer_size, int num_labels, double[][] x, double[][] y, double lambda)
@@ -177,21 +192,52 @@ public class NeuralNetwork
 		return result;
 	}
 
-	public static void randInitializeWeights(int input_size, double[] L_int, int output_size, double[] L_out)
+	private void randInitializeWeights()
 	{
-
 		double parametro_e = 0.12;
-
-		for (int i = 0; i < input_size; i++)
+		
+		for (int i = 0; i < Theta1.length; i++)
 		{
-			L_int[i] = (Math.random() * 2 * parametro_e) - parametro_e;
+			for (int j = 0; j < Theta1[0].length; j++)
+			{
+				Theta1[i][j] = (Math.random() * 2 * parametro_e) - parametro_e;
+			}
+		}
+		
+		for (int i = 0; i < Theta2.length; i++)
+		{
+			for (int j = 0; j < Theta1[0].length; j++)
+			{
+				Theta2[i][j] = (Math.random() * 2 * parametro_e) - parametro_e;
+			}
 		}
 
-		for (int j = 0; j < output_size; j++)
+	}
+	
+	public static int[] prediceRNYaEntrenada(double[][] x, double[][] Theta1, double[][] Theta2)
+	{
+		NeuralNetwork network = new NeuralNetwork(Theta1, Theta2);
+		
+		int[] y = new int[x.length];
+		
+		for (int i = 0; i < x.length; i++)
 		{
-			L_int[j] = (Math.random() * 2 * parametro_e) - parametro_e;
+			double[] result = network.feedForward(x[i]);
+			
+			double maxNumber = Double.NEGATIVE_INFINITY;
+			int maxIndex = 0;
+			for (int j = 0; j < result.length; j++)
+			{
+				if (result[j] > maxNumber)
+				{
+					maxNumber = result[j];
+					maxIndex = j;
+				}
+			}
+			y[i] = maxIndex + 1;
 		}
-
+		
+		return y;
 	}
 
 }
