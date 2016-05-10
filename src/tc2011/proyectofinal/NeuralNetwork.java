@@ -5,7 +5,8 @@
  */
 package tc2011.proyectofinal;
 
-import static tc2011.proyectofinal.Helpers.sum;
+import java.util.*;
+import static tc2011.proyectofinal.Helpers.*;
 
 /**
  *
@@ -29,48 +30,37 @@ public class NeuralNetwork
 		z2 = new double[hidden_size + 1];
 		z3 = new double[output_size];
 		Theta1 = new double[hidden_size][input_size + 1];
-		for (int i = 0; i < hidden_size; i++)
-		{
-			Theta1[i][input_size] = 1;
-		}
 		Theta2 = new double[output_size][hidden_size + 1];
-		for (int i = 0; i < output_size; i++)
-		{
-			Theta2[i][hidden_size] = 1;
-		}
 	}
 
-	public void feedForward(double[] a1, double[] a2, double[] a3, double[][] x)
+	public void feedForward(double[] x)
 	{
-
 		//Primera capa
-		for (int i = 0; i < x.length; i++)
+		a1[0] = 1; // bias
+		for (int i = 1; i < a1.length; i++)
 		{
-			for (int j = 0; j < a1.length; j++)
-			{
-				a1[j] = x[i][j];
-			}
+			a1[i] = x[i];
 		}
 
 		//Capa Intermedia
-		double z2[] = multMatrix(Theta1, a1);
-		for (int j = 0; j < z2.length; j++)
+		z2 = multMatrix(Theta1, a1);
+		a2[0] = 1; // bias
+		for (int i = 1; i < z2.length; i++)
 		{
-			a2[j] = g(z2[j]);
+			a2[i] = g(z2[i]);
 		}
 
 		//Capa de salida
-		double z3[] = multMatrix(Theta2, a2);
-		for (int j = 0; j < z3.length; j++)
+		z3 = multMatrix(Theta2, a2);
+		for (int i = 0; i < z3.length; i++)
 		{
-			a3[j] = g(z3[j]);
+			a3[i] = g(z3[i]);
 		}
-
 	}
 
 	public double rnFuncionCosto(double[][] Theta1, double[][] Theta2, int input_layer_size, int hidden_layer_size, int num_labels, double[][] x, double[][] y, double lambda)
 	{
-		int m = x.length;//input_layer_size;
+		int m = x.length;
 		int K = num_labels;
 
 		double J_Θ
@@ -83,30 +73,88 @@ public class NeuralNetwork
 			+ (lambda / (2 * m))
 			* (sum(0, hidden_layer_size, j
 				-> sum(0, input_layer_size, k
-					-> Math.pow(Theta1[j][k], 2)
+					-> Math.pow(Theta1[j][k + 1], 2)
 				)
 			)
 			+ sum(0, num_labels, j
 				-> sum(0, hidden_layer_size, k
-					-> Math.pow(Theta2[j][k], 2)
+					-> Math.pow(Theta2[j][k + 1], 2)
 				)
 			));
 
+		double[][] Δ1 = null;
+		double[][] Δ2 = null;
 		for (int i = 0; i < x.length; i++)
 		{
+			feedForward(x[i]);
+			
 			double[] δ3 = new double[a3.length];
-
 			for (int k = 0; k < a3.length; k++)
 			{
 				δ3[k] = (a3[k] - y[i][k]);
 			}
 
-			double[] δ2 = Helpers.pointMult(Helpers.multMatrix(Helpers.transposeMatrix(Theta2), δ3), sigmoidGradient(z2));
-
-			// INCOMPLETE
+			double[] δ2 = pointMult(multMatrix(transposeMatrix(Theta2), δ3), sigmoidGradient(z2));
+			if (Δ2 == null)
+			{
+				Δ2 = multMatrix(δ3, transposeMatrix(a2));
+			}
+			else
+			{
+				Δ2 = addMatrix(Δ2, multMatrix(δ3, transposeMatrix(a2)));
+			}
+			if (Δ1 == null)
+			{
+				Δ1 = multMatrix(Arrays.copyOfRange(δ2, 1, δ2.length), transposeMatrix(a1));
+			}
+			else
+			{
+				Δ1 = addMatrix(Δ1, multMatrix(Arrays.copyOfRange(δ2, 1, δ2.length), transposeMatrix(a1)));
+			}
+		}
+		
+		double[][] D1 = new double[Δ1.length][Δ1[0].length];
+		for (int i = 0; i < D1.length; i++)
+		{
+			int j = 0;
+			D1[i][j] = (1.0 / m) * Δ1[i][j];
+			for (j = 1; j < D1[0].length; j++)
+			{
+				D1[i][j] = (1.0 / m) * Δ1[i][j] + (lambda / m) * Theta1[i][j];
+			}
+		}
+		
+		double[][] D2 = new double[Δ2.length][Δ2[0].length];
+		for (int i = 0; i < D2.length; i++)
+		{
+			int j = 0;
+			D2[i][j] = (1.0 / m) * Δ2[i][j];
+			for (j = 1; j < D2[0].length; j++)
+			{
+				D2[i][j] = (1.0 / m) * Δ2[i][j] + (lambda / m) * Theta1[i][j];
+			}
+		}
+		
+		
+		double learningRate = 0.7;
+		
+		for (int i = 0; i < Theta1.length; i++)
+		{
+			for (int j = 0; j < Theta1[0].length; j++)
+			{
+				Theta1[i][j] = Theta1[i][j] - (D1[i][j] * learningRate);
+			}
+		}
+		
+		for (int i = 0; i < Theta2.length; i++)
+		{
+			for (int j = 0; j < Theta1[0].length; j++)
+			{
+				Theta2[i][j] = Theta2[i][j] - (D2[i][j] * learningRate);
+			}
 		}
 
-		return 0;
+		return J_Θ;
 	}
 
 	public static double g(double z)
