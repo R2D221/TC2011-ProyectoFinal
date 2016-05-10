@@ -12,6 +12,9 @@ package tc2011.proyectofinal;
 public class TC2011ProyectoFinal
 {
 
+	 static double[][] x;
+     static List<double[]> lectura_ejemplos = new LinkedList<>()
+
 	public static void main(String[] args) throws IOException 
 	{
           
