@@ -21,11 +21,19 @@ public class NeuralNetwork
 	
 	public NeuralNetwork(int input_size, int hidden_size, int output_size)
 	{
-		a1 = new double[input_size];
-		a2 = new double[hidden_size];
+		a1 = new double[input_size + 1];
+		a2 = new double[hidden_size + 1];
 		a3 = new double[output_size];
-		Theta1 = new double[hidden_size][input_size];
-        Theta2 = new double[output_size][hidden_size];
+		Theta1 = new double[hidden_size][input_size + 1];
+		for (int i = 0; i < hidden_size; i++)
+		{
+			Theta1[i][input_size] = 1;
+		}
+        Theta2 = new double[output_size][hidden_size + 1];
+		for (int i = 0; i < output_size; i++)
+		{
+			Theta2[i][hidden_size] = 1;
+		}
 	}
 	
 	//public static 
@@ -57,6 +65,18 @@ public class NeuralNetwork
 					)
 				)
 			);
+		
+		// [insert feedforward here]
+		
+		for (int i = 0; i < x.length; i++)
+		{
+			double[] δ3 = new double[a3.length];
+			
+			for (int k = 0; k < a3.length; k++)
+			{
+				δ3[k] = (a3[k] - y[i][k]);
+			}
+		}
 		
 		return 0;
 	}
