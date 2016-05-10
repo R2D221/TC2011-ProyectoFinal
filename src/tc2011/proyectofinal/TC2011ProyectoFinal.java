@@ -12,24 +12,34 @@ package tc2011.proyectofinal;
 public class TC2011ProyectoFinal
 {
 
-	 static double[][] x;
-     static List<double[]> lectura_ejemplos = new LinkedList<>()
+	static double[][] x;
+        static List<double[]> lectura_ejemplos = new LinkedList<>();
+        static double[][] y;
+        static List<double[]> lectura_pruebas = new LinkedList<>();
 
 	public static void main(String[] args) throws IOException 
 	{
-          
-        leerArchivoEjemplos();
-        x = ListToArray(lectura_ejemplos);    		
+            leerArchivoEjemplos();
+            x = ListToArray(lectura_ejemplos); 
+            leerArchivoPruebas(); 
+            y = ListToArray(lectura_pruebas);
+            
+            for(double[] a : lectura_pruebas){
+                for(int j=0; j < a.length; j++){
+                    System.out.print(a[j] + " ");
+                }
+                System.out.println("");
+            } 
 	}
         
         public static void leerArchivoEjemplos() throws FileNotFoundException, IOException{
              try {
-                FileInputStream fstream = new FileInputStream("X.txt");
-                
+                FileInputStream fstream = new FileInputStream("X.txt");                              
                 DataInputStream entrada = new DataInputStream(fstream);
                 
                 BufferedReader buffer = new BufferedReader(new InputStreamReader(entrada));
                 String strLinea;
+                String ejemplo[];
                 while ((strLinea = buffer.readLine()) != null && !(strLinea.equals(""))) {
                     ejemplo = strLinea.substring(1,strLinea.length()).split(" ");                                  
                     double[] copia_ejemplo = new double[ejemplo.length];                  
@@ -37,8 +47,33 @@ public class TC2011ProyectoFinal
                          double a = Double.parseDouble(ejemplo[i]);                                               
                          copia_ejemplo[i] = Double.parseDouble(ejemplo[i]);                    
                      }
-                     System.out.println("Con " + copia_ejemplo.length + " valores");
                      lectura_ejemplos.add(copia_ejemplo); 
+                }                
+                entrada.close();
+            } catch (Exception e) { 
+                System.err.println("Ocurrio un error: " + e.getMessage());
+            }
+        }
+        
+    public static void leerArchivoPruebas() throws FileNotFoundException, IOException{
+             try {
+                FileInputStream fstream = new FileInputStream("y.txt");                              
+                DataInputStream entrada = new DataInputStream(fstream);
+                
+                BufferedReader buffer = new BufferedReader(new InputStreamReader(entrada));
+                String strLinea;
+                while ((strLinea = buffer.readLine()) != null && !(strLinea.equals(""))) {
+                                                        
+                    int ejemplo = Integer.parseInt(strLinea.substring(1,strLinea.length()));
+                    double[] digito = new double[11]; 
+                    
+                    if(ejemplo != 0){
+                       digito[ejemplo-1] = 1;
+                    }else{
+                       digito[10] = 1;
+                    }
+                    
+                    lectura_pruebas.add(digito);
                 }                
                 entrada.close();
             } catch (Exception e) { 
